@@ -3,28 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>انضم للمسابقة</title>
+    <title>المسابقة الكبرى | VIP Raffle</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
-<body id="click-area">
+<body id="user-page">
 
-    <div class="container">
-        <h1>مرحباً بك!</h1>
-        <p>رمزك الخاص: <span id="user-code" style="color:#e94560; font-weight:bold;"></span></p>
+    <div id="secret-click-area"></div>
+
+    <div class="glass-card">
+        <div class="logo-area">
+            <h1>🏆 السحب الكبير</h1>
+            <p>فرصة العمر لربح جوائز قيمة</p>
+        </div>
+
+        <div class="user-info">
+            <p>رمزك التعريفي:</p>
+            <h2 id="user-code" class="neon-text">---</h2>
+        </div>
         
-        <input type="text" id="username" placeholder="@username (تيك توك)" required>
-        <br>
-        <button onclick="joinRaffle()">انضمام للقرعة</button>
-        <p id="msg" style="margin-top:10px; font-size:0.9rem;"></p>
+        <div class="input-group">
+            <input type="text" id="username" placeholder="أدخل حساب تيك توك (مثال: @user)" autocomplete="off">
+            <button onclick="joinRaffle()" class="btn-primary">انضمام للسحب 🚀</button>
+        </div>
+        
+        <p id="msg" class="status-msg"></p>
     </div>
 
     <div id="admin-modal" class="modal">
         <div class="modal-content">
-            <h2 style="color:#333">دخول المدير</h2>
+            <h3>🔐 دخول لوحة التحكم</h3>
             <input type="password" id="admin-pass" placeholder="كلمة المرور">
-            <br>
-            <button onclick="checkPass()">دخول</button>
-            <button onclick="closeModal()" style="background:#555; margin-right:5px;">إغلاق</button>
+            <div class="modal-actions">
+                <button onclick="checkPass()" class="btn-confirm">دخول</button>
+                <button onclick="closeModal()" class="btn-cancel">إغلاق</button>
+            </div>
         </div>
     </div>
 
