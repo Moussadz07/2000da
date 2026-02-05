@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - العجلة</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container" style="max-width: 600px;">
+        <h2>🎡 عجلة الحظ العشوائية</h2>
+        
+        <div id="wheel-container">
+            <div id="arrow"></div>
+            <canvas id="wheel" width="500" height="500"></canvas>
+        </div>
+
+        <br><br>
+        <button onclick="spinWheel()">تدوير العجلة 🎲</button>
+        <br><br>
+        <button onclick="clearData()" style="background:#555; font-size:0.8rem;">مسح المشاركين</button>
+        <a href="index.html" style="color:white; display:block; margin-top:10px;">رجوع للرئيسية</a>
+    </div>
+
+    <script>const isAdminPage = true;</script>
+    <script src="script.js"></script>
+</body>
+</html>

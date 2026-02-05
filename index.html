@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>انضم للمسابقة</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body id="click-area">
+
+    <div class="container">
+        <h1>مرحباً بك!</h1>
+        <p>رمزك الخاص: <span id="user-code" style="color:#e94560; font-weight:bold;"></span></p>
+        
+        <input type="text" id="username" placeholder="@username (تيك توك)" required>
+        <br>
+        <button onclick="joinRaffle()">انضمام للقرعة</button>
+        <p id="msg" style="margin-top:10px; font-size:0.9rem;"></p>
+    </div>
+
+    <div id="admin-modal" class="modal">
+        <div class="modal-content">
+            <h2 style="color:#333">دخول المدير</h2>
+            <input type="password" id="admin-pass" placeholder="كلمة المرور">
+            <br>
+            <button onclick="checkPass()">دخول</button>
+            <button onclick="closeModal()" style="background:#555; margin-right:5px;">إغلاق</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
