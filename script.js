@@ -1,169 +1,201 @@
-// ================= المتغيرات العامة =================
-const storageKey = 'raffle_users';
+const storageKey = 'raffle_v2_users';
 
-// ================= منطق واجهة المستخدم (index.html) =================
+// ================= الجزء الخاص بالمستخدم (index.html) =================
 if (typeof isAdminPage === 'undefined') {
-    
-    // 1. توليد رمز عشوائي للمستخدم
-    const userCode = 'USER-' + Math.floor(1000 + Math.random() * 9000);
-    const codeSpan = document.getElementById('user-code');
-    if(codeSpan) codeSpan.innerText = userCode;
+    // 1. توليد كود المستخدم
+    const userCode = 'ID-' + Math.floor(Math.random() * 9000 + 1000);
+    const codeEl = document.getElementById('user-code');
+    if(codeEl) codeEl.innerText = userCode;
 
-    // 2. تسجيل المستخدم
+    // 2. الانضمام
     function joinRaffle() {
         const input = document.getElementById('username');
-        let username = input.value.trim();
         const msg = document.getElementById('msg');
+        let username = input.value.trim();
 
         if (!username) {
-            msg.innerText = "يرجى كتابة اسم المستخدم!";
-            msg.style.color = "red";
+            msg.innerText = "⚠️ يرجى كتابة اسم المستخدم";
+            msg.style.color = "#e74c3c";
             return;
         }
 
-        // إضافة @ إذا لم تكن موجودة
         if (!username.startsWith('@')) username = '@' + username;
 
-        // حفظ البيانات في المتصفح
         let users = JSON.parse(localStorage.getItem(storageKey)) || [];
         
-        // التحقق من التكرار
-        if(users.includes(username)) {
-            msg.innerText = "لقد قمت بالتسجيل مسبقاً!";
-            msg.style.color = "orange";
+        // منع التكرار
+        if(users.some(u => u.toLowerCase() === username.toLowerCase())) {
+            msg.innerText = "⛔ أنت مسجل بالفعل!";
+            msg.style.color = "#f1c40f";
             return;
         }
 
         users.push(username);
         localStorage.setItem(storageKey, JSON.stringify(users));
-
-        msg.innerText = "تم تسجيلك في القرعة بنجاح! ✅";
-        msg.style.color = "#4cd137";
+        
+        msg.innerText = "✅ تم تسجيلك بنجاح!";
+        msg.style.color = "#2ecc71";
         input.value = '';
     }
 
     // 3. المنطقة السرية (12 نقرة)
-    let clickCount = 0;
-    const clickArea = document.getElementById('click-area');
+    let clicks = 0;
+    const clickArea = document.getElementById('secret-click-area');
     const modal = document.getElementById('admin-modal');
 
-    // كشف النقرات على الخلفية فقط
-    clickArea.addEventListener('click', function(e) {
-        // التأكد أن النقر تم على الخلفية وليس على الأزرار
-        if(e.target === clickArea || e.target.classList.contains('container')) {
-            clickCount++;
-            console.log("Clicks: " + clickCount);
-            
-            if (clickCount === 12) {
+    if(clickArea) {
+        clickArea.addEventListener('click', () => {
+            clicks++;
+            console.log("Click:", clicks);
+            if (clicks === 12) {
                 modal.style.display = 'flex';
-                clickCount = 0; // تصفير العداد
+                clicks = 0;
             }
-        }
-    });
-
-    function closeModal() {
-        modal.style.display = 'none';
+        });
     }
 
+    function closeModal() { modal.style.display = 'none'; }
+    
     function checkPass() {
-        const pass = document.getElementById('admin-pass').value;
-        // كلمة السر المطلوبة
-        if (pass === 'Mmoussadzx07@') {
-            window.location.href = 'admin.html';
-        } else {
-            alert('كلمة المرور خاطئة!');
-        }
+        const p = document.getElementById('admin-pass').value;
+        if (p === 'Mmoussadzx07@') window.location.href = 'admin.html';
+        else alert('كلمة مرور خاطئة');
     }
 }
 
-// ================= منطق واجهة الأدمن والعجلة (admin.html) =================
+// ================= الجزء الخاص بالأدمن (admin.html) =================
 if (typeof isAdminPage !== 'undefined' && isAdminPage === true) {
-
+    
     const canvas = document.getElementById('wheel');
     const ctx = canvas.getContext('2d');
-    let users = JSON.parse(localStorage.getItem(storageKey)) || ['لا يوجد مشاركين', 'تجربة', 'مثال'];
+    let users = JSON.parse(localStorage.getItem(storageKey)) || ['تيك توك', 'مسابقة', 'تجربة', 'فائز 1', 'فائز 2', 'مثال'];
     
-    // ألوان العجلة
-    const colors = ['#e94560', '#16213e', '#0f3460', '#533483', '#E94560', '#1A1A2E'];
-
+    // ألوان احترافية متناوبة
+    const colors = ['#8e44ad', '#2980b9', '#e67e22', '#16a085', '#c0392b', '#2c3e50'];
+    
     let startAngle = 0;
     let arc = Math.PI * 2 / users.length;
     let spinTimeout = null;
-    let spinArcStart = 10;
+    let spinAngleStart = 0;
     let spinTime = 0;
     let spinTimeTotal = 0;
     let isSpinning = false;
+    
+    // إعدادات الصوت (Web Audio API)
+    let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let lastPlayedSector = -1;
 
-    // رسم العجلة
-    function drawRouletteWheel() {
-        // تحديث القوس بناءً على عدد المستخدمين الجدد
-        arc = Math.PI * 2 / users.length;
+    function playTickSound() {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
         
-        if (canvas.getContext) {
-            const outsideRadius = 200;
-            const textRadius = 160;
-            const insideRadius = 0; // عجلة مصمتة
+        osc.type = 'triangle'; // نوع الموجة الصوتية
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime); // تردد حاد
+        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+        
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+    }
 
-            ctx.clearRect(0,0,500,500);
+    // دالة الرسم الأساسية
+    function drawRouletteWheel() {
+        // تحديث القيمة في حال زاد عدد المستخدمين
+        if (users.length === 0) users = ['لا يوجد مشاركين'];
+        arc = Math.PI * 2 / users.length;
 
-            ctx.strokeStyle = "white";
-            ctx.lineWidth = 2;
+        // تنظيف الكانفاس
+        ctx.clearRect(0, 0, 600, 600);
+        
+        const outsideRadius = 280;
+        const textRadius = 220; // موقع النص
+        const insideRadius = 50;
 
-            for(let i = 0; i < users.length; i++) {
-                const angle = startAngle + i * arc;
-                ctx.fillStyle = colors[i % colors.length];
+        ctx.strokeStyle = "#ecf0f1";
+        ctx.lineWidth = 2;
+        ctx.font = 'bold 18px Tajawal';
 
-                ctx.beginPath();
-                ctx.arc(250, 250, outsideRadius, angle, angle + arc, false);
-                ctx.arc(250, 250, insideRadius, angle + arc, angle, true);
-                ctx.stroke();
-                ctx.fill();
+        for(let i = 0; i < users.length; i++) {
+            const angle = startAngle + i * arc;
+            
+            // 1. رسم القطعة (Sector)
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.beginPath();
+            ctx.arc(300, 300, outsideRadius, angle, angle + arc, false);
+            ctx.arc(300, 300, insideRadius, angle + arc, angle, true);
+            ctx.fill();
+            ctx.stroke();
 
-                ctx.save();
-                ctx.shadowOffsetX = -1;
-                ctx.shadowOffsetY = -1;
-                ctx.shadowBlur    = 0;
-                ctx.fillStyle = "white";
-                ctx.translate(250 + Math.cos(angle + arc / 2) * textRadius, 
-                              250 + Math.sin(angle + arc / 2) * textRadius);
-                ctx.rotate(angle + arc / 2 + Math.PI / 2);
-                const text = users[i];
-                ctx.font = 'bold 16px Cairo';
-                ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
-                ctx.restore();
-            }
+            // 2. رسم النص (السر هنا)
+            ctx.save();
+            ctx.fillStyle = "white";
+            
+            // ننتقل إلى مركز العجلة
+            ctx.translate(300, 300);
+            // ندوّر الكانفاس ليشير إلى منتصف القطعة الحالية
+            ctx.rotate(angle + arc / 2);
+            
+            // الآن نكتب النص. لأنه تم التدوير، نكتبه أفقياً ببساطة
+            ctx.textAlign = "right";
+            ctx.fillText(users[i], outsideRadius - 20, 10); // 20px هو الهامش من الحافة
+            
+            ctx.restore();
         }
     }
 
-    // بدء الدوران
     function spinWheel() {
         if(isSpinning) return;
-        if(users.length === 0) { alert('لا يوجد مشاركين!'); return; }
-        
         isSpinning = true;
+        
+        // سرعة جنونية في البداية
+        spinAngleStart = Math.random() * 20 + 20; // سرعة دوران عالية
         spinTime = 0;
-        // زمن دوران عشوائي بين 5 و 8 ثواني لضمان الشفافية
-        spinTimeTotal = Math.random() * 3000 + 4000 * 1; 
+        spinTimeTotal = Math.random() * 5000 + 4000; // وقت بين 4 و 9 ثواني
+        
         rotateWheel();
     }
 
-    // حركة الدوران الفيزيائية
     function rotateWheel() {
-        spinTime += 30;
+        spinTime += 20;
+        
+        // معادلة التباطؤ (كلما اقترب الوقت من النهاية، قلت الزاوية المضافة)
         if(spinTime >= spinTimeTotal) {
             stopRotateWheel();
             return;
         }
         
-        // معادلة التباطؤ (Easing Out)
+        // معادلة EaseOut Cubic لحركة ناعمة
         const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
         startAngle += (spinAngle * Math.PI / 180);
+        
+        // منطق الصوت
+        checkSound(startAngle);
+        
         drawRouletteWheel();
-        spinTimeout = setTimeout(rotateWheel, 30);
+        requestAnimationFrame(rotateWheel);
+    }
+
+    // دالة لتشغيل الصوت عند عبور الخطوط
+    function checkSound(angle) {
+        // نحسب الدرجة الحالية (0-360)
+        const degrees = angle * 180 / Math.PI + 90;
+        const arcd = 360 / users.length;
+        // المؤشر (Index) الحالي الذي يمر تحت السهم
+        const currentIndex = Math.floor((360 - degrees % 360) / arcd);
+
+        if (lastPlayedSector !== currentIndex) {
+            playTickSound();
+            lastPlayedSector = currentIndex;
+        }
     }
 
     function stopRotateWheel() {
-        clearTimeout(spinTimeout);
         isSpinning = false;
         
         // حساب الفائز
@@ -171,37 +203,36 @@ if (typeof isAdminPage !== 'undefined' && isAdminPage === true) {
         const arcd = 360 / users.length;
         const index = Math.floor((360 - degrees % 360) / arcd);
         
-        ctx.save();
-        ctx.font = 'bold 30px Cairo';
-        const text = users[index];
-        // تأثير فوز بصري
-        alert("الفائز هو: " + text + "\nسيتم فتح حسابه الآن!");
+        const winnerName = users[index];
         
-        // فتح حساب تيك توك تلقائياً
-        let cleanUsername = text.replace('@', '');
-        window.open(`https://www.tiktok.com/@${cleanUsername}`, '_blank');
-        
-        ctx.restore();
+        // تأثير الاحتفال
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+
+        // فتح الرابط بعد ثانية ونصف
+        setTimeout(() => {
+            const cleanUser = winnerName.replace('@', '');
+            window.open(`https://www.tiktok.com/@${cleanUser}`, '_blank');
+            alert(`🎉 مبروك! الفائز هو: ${winnerName}`);
+        }, 1500);
     }
 
-    // دالة الحركة الفيزيائية
     function easeOut(t, b, c, d) {
         const ts = (t/=d)*t;
         const tc = ts*t;
         return b+c*(tc + -3*ts + 3*t);
     }
 
-    // مسح البيانات
     function clearData() {
-        if(confirm("هل أنت متأكد من مسح جميع الأسماء؟")) {
+        if(confirm("هل أنت متأكد من حذف جميع المشاركين؟")) {
             localStorage.removeItem(storageKey);
             location.reload();
         }
     }
 
-    // متغير ابتدائي لسرعة الدوران
-    var spinAngleStart = Math.random() * 10 + 10;
-    
-    // التشغيل الأولي
+    // الرسم الأولي
     drawRouletteWheel();
 }
