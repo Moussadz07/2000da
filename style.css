@@ -1,111 +1,137 @@
-/* style.css */
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+:root {
+    --primary: #f1c40f; /* ذهبي */
+    --accent: #8e44ad; /* بنفسجي */
+    --dark-bg: #1a1a2e;
+    --glass: rgba(255, 255, 255, 0.05);
+    --neon: 0 0 10px rgba(241, 196, 15, 0.5);
+}
 
 body {
-    font-family: 'Cairo', sans-serif;
     margin: 0;
     padding: 0;
+    font-family: 'Tajawal', sans-serif;
+    background: radial-gradient(circle at center, #16213e 0%, #000000 100%);
+    color: white;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-    color: white;
     overflow: hidden;
 }
 
-.container {
-    text-align: center;
-    background: rgba(255, 255, 255, 0.1);
+/* User Page Styles */
+#secret-click-area {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1;
+}
+
+.glass-card {
+    position: relative;
+    z-index: 10;
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
     padding: 3rem;
     border-radius: 20px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
     width: 90%;
-    max-width: 500px;
+    max-width: 450px;
 }
 
-input {
-    width: 80%;
+.input-group input {
+    width: 100%;
     padding: 15px;
     margin: 15px 0;
-    border-radius: 50px;
-    border: none;
-    text-align: center;
-    font-size: 1.1rem;
-    outline: none;
-}
-
-button {
-    background: #e94560;
+    border-radius: 10px;
+    border: 1px solid #444;
+    background: rgba(0,0,0,0.3);
     color: white;
-    padding: 15px 40px;
+    font-size: 1.1rem;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #e67e22, #f1c40f);
     border: none;
-    border-radius: 50px;
+    padding: 15px 40px;
+    color: #000;
+    font-weight: 900;
     font-size: 1.2rem;
+    border-radius: 50px;
     cursor: pointer;
-    font-weight: bold;
+    width: 100%;
     transition: 0.3s;
+    box-shadow: var(--neon);
 }
 
-button:hover {
-    background: #c12c45;
-    transform: scale(1.05);
+.btn-primary:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(241, 196, 15, 0.8);
 }
 
-/* Wheel Styles */
-#wheel-container {
+.neon-text {
+    color: var(--primary);
+    text-shadow: var(--neon);
+    font-size: 2rem;
+    margin: 10px 0;
+}
+
+/* Admin & Wheel Styles */
+.wheel-wrapper {
     position: relative;
-    width: 400px;
-    height: 400px;
-    margin: 0 auto;
+    width: 500px;
+    height: 500px;
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 canvas {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    border: 5px solid #fff;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
+    transition: transform 0.1s; /* Smooth rendering */
 }
 
-#arrow {
+/* المؤشر */
+.marker {
     position: absolute;
     top: -20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 0; 
-    height: 0; 
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-    border-top: 40px solid #e94560;
-    z-index: 10;
+    width: 0;
+    height: 0;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-top: 50px solid #e74c3c;
+    z-index: 50;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
 }
 
-/* Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
+/* زر التدوير في الوسط */
+#spin-btn {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, #fff 30%, #ddd 100%);
+    border-radius: 50%;
+    border: 4px solid #333;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 20;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1.1rem;
 }
 
-.modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    text-align: center;
-}
+.btn-danger { background: #c0392b; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+.btn-link { color: #aaa; text-decoration: none; margin-left: 10px; }
 
-.modal input {
-    border: 1px solid #ccc;
-    background: #eee;
-    color: #333;
-}
+/* Modal */
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; }
+.modal-content { background: #2c3e50; padding: 30px; border-radius: 10px; text-align: center; border: 1px solid var(--primary); }
