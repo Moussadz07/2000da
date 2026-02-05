@@ -1,6 +1,6 @@
 :root {
-    --primary: #f1c40f; /* ذهبي */
-    --accent: #8e44ad; /* بنفسجي */
+    --primary: #f1c40f; 
+    --accent: #8e44ad; 
     --dark-bg: #1a1a2e;
     --glass: rgba(255, 255, 255, 0.05);
     --neon: 0 0 10px rgba(241, 196, 15, 0.5);
@@ -17,13 +17,7 @@ body {
     justify-content: center;
     align-items: center;
     overflow: hidden;
-}
-
-/* User Page Styles */
-#secret-click-area {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 1;
+    user-select: none; /* منع تحديد النص لتسهيل النقر */
 }
 
 .glass-card {
@@ -79,7 +73,7 @@ body {
     margin: 10px 0;
 }
 
-/* Admin & Wheel Styles */
+/* Wheel Styles */
 .wheel-wrapper {
     position: relative;
     width: 500px;
@@ -95,17 +89,14 @@ canvas {
     height: 100%;
     border-radius: 50%;
     box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
-    transition: transform 0.1s; /* Smooth rendering */
 }
 
-/* المؤشر */
 .marker {
     position: absolute;
     top: -20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 0;
-    height: 0;
+    width: 0; height: 0;
     border-left: 25px solid transparent;
     border-right: 25px solid transparent;
     border-top: 50px solid #e74c3c;
@@ -113,11 +104,9 @@ canvas {
     filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
 }
 
-/* زر التدوير في الوسط */
 #spin-btn {
     position: absolute;
-    width: 80px;
-    height: 80px;
+    width: 80px; height: 80px;
     background: radial-gradient(circle, #fff 30%, #ddd 100%);
     border-radius: 50%;
     border: 4px solid #333;
@@ -125,12 +114,13 @@ canvas {
     cursor: pointer;
     z-index: 20;
     box-shadow: 0 0 15px rgba(0,0,0,0.5);
-    font-family: 'Tajawal', sans-serif;
     font-size: 1.1rem;
 }
 
 .btn-danger { background: #c0392b; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
 .btn-link { color: #aaa; text-decoration: none; margin-left: 10px; }
+.btn-confirm { background: #27ae60; color: white; padding: 10px 20px; border:none; border-radius: 5px; cursor: pointer; }
+.btn-cancel { background: #c0392b; color: white; padding: 10px 20px; border:none; border-radius: 5px; cursor: pointer; margin-right: 5px;}
 
 /* Modal */
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; }
